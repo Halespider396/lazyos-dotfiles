@@ -1,0 +1,5 @@
+[urgency_normal]:
+
+background = "#1a1a2e"
+foreground = "#00FFFF"
+frame_color = "#00FFFF"

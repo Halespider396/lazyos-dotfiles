@@ -1,0 +1,9 @@
+[colors.primary]
+background = "#1a1a2e"
+foreground = "#00FFFF"
+
+[font]
+size = 11.0
+
+[terminal]
+shell = { program = "/usr/bin/zsh" }
