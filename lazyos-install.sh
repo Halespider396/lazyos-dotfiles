@@ -21,6 +21,10 @@ cat << "EOF"
 /_____/\__,_/ /___/\__, /\____//____/  
                   /____/               
 EOF
+if [ "$EUID" -ne 0 ]; then
+  echo "Please run as root: curl URL | sudo bash -s -- YouyName"
+  exit 1
+fi
 echo -e "${NC}"
 echo -e "${CYAN}Welcome to LazyOS Installer!${NC}"
 echo ""
@@ -28,7 +32,7 @@ echo "Press ENTER to continue..."
 read
 echo ""
 echo "Enter your username:"
-read USERNAME
+USERNAME=${1:-"user"}
 echo "Hello $USERNAME! Installing LazyOS..."
 
 echo ""
@@ -42,7 +46,7 @@ echo -e "${CYAN}[2/5]${NC} Installing core packages..."
 sudo pacman -S --noconfirm i3-wm polybar rofi alacritty picom feh dunst
 
 echo -e "${CYAN}[3/5]${NC} Installing tools..."
-sudo pacman -S --noconfirm neovim ranger btop fastfetch zsh
+pacman -S --noconfirm neovim ranger btop fastfetch zsh
 
 echo -e "${CYAN}[4/5]${NC} Installing AUR packages..."
 yay -S --noconfirm zen-browser-bin i3lock-color
