@@ -46,12 +46,12 @@ echo -e "${CYAN}[2/5]${NC} Installing core packages..."
 sudo pacman -S --noconfirm i3-wm polybar rofi alacritty picom feh dunst
 
 echo -e "${CYAN}[3/5]${NC} Installing tools..."
-pacman -S --noconfirm neovim ranger btop fastfetch zsh git
+pacman -S --noconfirm neovim ranger btop fastfetch zsh
+pacman -S --noconfirm git base-devel
 
 echo -e "${CYAN}[3.5/5]${NC} Installing yay..."
 cd /tmp
 git clone https://aur.archlinux.org/yay.git
-cd yay
 cd yay
 makepkg -si --noconfirm
 cd ~
