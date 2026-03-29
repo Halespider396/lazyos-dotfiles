@@ -20,7 +20,7 @@ echo -e "${NC}"
 
 # Root check
 if [ "$EUID" -ne 0 ]; then
-  echo -e "${RED}Please run as root:${NC} curl <URL> | sudo bash -s -- YourName"
+  echo -e "${RED}Please run as root:${NC} curl https://github.com/Halespider396/lazyos-dotfiles/raw/refs/heads/main/lazyos-install.sh | sudo bash -s -- YourName"
   exit 1
 fi
 
