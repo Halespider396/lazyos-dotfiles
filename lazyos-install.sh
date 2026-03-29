@@ -13,16 +13,24 @@ cat << "EOF"
    / /   ____ _____  __  __/ __ \/ ___/
   / /   / __ `/_  / / / / / / / /\__ \ 
  / /___/ /_/ / / /_/ /_/ / /_/ /___/ / 
-/_____/\__,_/ /___/\__, /\____//____/  
-                  /____/               
+/_____/_\__,_/ /___/\__, /\____//____/  
+                   /____/               
 EOF
 echo -e "${NC}"
 
 # Root check
 if [ "$EUID" -ne 0 ]; then
-  echo -e "${RED}Please run as root:${NC} curl https://github.com/Halespider396/lazyos-dotfiles/raw/refs/heads/main/lazyos-install.sh | sudo bash -s -- YourName"
+  echo -e "${RED}Please run as root:${NC} sudo bash lazyos-install.sh YourUsername"
   exit 1
 fi
+
+# User detection
+if [ -z "$SUDO_USER" ]; then
+  echo -e "${RED}[ERROR]${NC} This script must be run with sudo"
+  exit 1
+fi
+
+BUILD_USER="$SUDO_USER"
 
 echo -e "${CYAN}Welcome to LazyOS Installer!${NC}"
 echo ""
@@ -30,7 +38,7 @@ echo "Press ENTER to continue..."
 read -r
 
 # Username
-USERNAME="${1:-user}"
+USERNAME="${1:-$BUILD_USER}"
 echo ""
 echo -e "Hello ${CYAN}${USERNAME}${NC}! Installing LazyOS..."
 echo ""
@@ -63,12 +71,11 @@ pacman -S --noconfirm \
 
 step "3.5/5" "Installing yay (AUR helper)..."
 # Build as a non-root user to satisfy makepkg requirements
-BUILD_USER="${SUDO_USER:-nobody}"
 BUILD_DIR="/tmp/yay-build"
 
 rm -rf "$BUILD_DIR"
 mkdir -p "$BUILD_DIR"
-chown "$BUILD_USER" "$BUILD_DIR"
+chown "$BUILD_USER:$BUILD_USER" "$BUILD_DIR"
 
 sudo -u "$BUILD_USER" git clone https://aur.archlinux.org/yay.git "$BUILD_DIR" || die "Failed to clone yay"
 cd "$BUILD_DIR" || die "Failed to enter build dir"
@@ -80,9 +87,9 @@ sudo -u "$BUILD_USER" yay -S --noconfirm \
   zen-browser-bin i3lock-color || die "AUR package install failed"
 
 step "5/5" "Copying dotfiles..."
-DOTFILES_DIR="/home/${SUDO_USER:-$USER}/lazyos-dotfiles"
+DOTFILES_DIR="/home/${BUILD_USER}/lazyos-dotfiles"
 DOTFILES_REPO="https://github.com/Halespider396/lazyos-dotfiles.git"
-CONFIG_DIR="/home/${SUDO_USER:-$USER}/.config"
+CONFIG_DIR="/home/${BUILD_USER}/.config"
 
 git clone "$DOTFILES_REPO" "$DOTFILES_DIR" || die "Failed to clone dotfiles"
 
@@ -93,7 +100,7 @@ done
 cp "${DOTFILES_DIR}/picom.conf" "${CONFIG_DIR}/picom.conf" || die "Failed to copy picom.conf"
 
 # Fix ownership so the actual user owns their config
-chown -R "${SUDO_USER:-$USER}:${SUDO_USER:-$USER}" "$CONFIG_DIR" "$DOTFILES_DIR"
+chown -R "${BUILD_USER}:${BUILD_USER}" "$CONFIG_DIR" "$DOTFILES_DIR"
 
 echo ""
 echo -e "${GREEN}[LazyOS]${NC} Installation complete! Welcome, ${CYAN}${USERNAME}${NC} 🎉"
